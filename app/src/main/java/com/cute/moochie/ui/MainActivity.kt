@@ -539,8 +539,17 @@ class MainActivity : AppCompatActivity() {
      */
     private fun checkNotificationPermission() {
         if (!notificationPermissionHelper.isNotificationListenerEnabled()) {
-            Log.d(TAG, "Notification permission not granted, showing required dialog")
-            notificationPermissionHelper.showRequiredPermissionDialog(this)
+            Log.d(TAG, "Notification permission not granted, opening settings directly")
+            
+            // Try to directly open the settings with the activity result launcher
+            try {
+                val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                notificationSettingsLauncher.launch(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error opening notification settings directly", e)
+                // Fall back to the helper method which will show a dialog
+                notificationPermissionHelper.showRequiredPermissionDialog(this)
+            }
         } else {
             Log.d(TAG, "Notification permission already granted")
             // Ensure service is running

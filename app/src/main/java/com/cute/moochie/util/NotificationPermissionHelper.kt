@@ -52,6 +52,17 @@ class NotificationPermissionHelper(private val context: Context) {
             return
         }
         
+        // Try to directly open the notification settings
+        try {
+            Log.d(TAG, "Directly opening notification listener settings")
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            activity.startActivity(intent)
+            return
+        } catch (e: Exception) {
+            Log.e(TAG, "Error directly opening notification settings, falling back to dialog", e)
+        }
+        
+        // If direct opening fails, show a dialog with instructions
         AlertDialog.Builder(context)
             .setTitle("Notification Access Required")
             .setMessage("This app needs notification access to monitor notifications. Please enable it in the next screen.")
