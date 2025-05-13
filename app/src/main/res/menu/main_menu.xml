@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <item
+        android:id="@+id/action_chat"
+        android:title="Chat"
+        android:icon="@drawable/ic_chat"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_notifications"
+        android:title="Notification History"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        app:showAsAction="never" />
+        
+    <item
+        android:id="@+id/action_sign_out"
+        android:title="Sign Out"
+        app:showAsAction="never" />
+        
+</menu> 

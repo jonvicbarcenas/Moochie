@@ -1,0 +1,11 @@
+{
+  "database": {
+    "rules": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "notifications": {
+        ".indexOn": ["userId"]
+      }
+    }
+  }
+} 
