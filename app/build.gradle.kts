@@ -13,9 +13,14 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0.1"
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Explicitly enable BuildConfig generation
+    buildFeatures {
+        buildConfig = true
     }
 
     signingConfigs {
@@ -60,6 +65,11 @@ dependencies {
     // Networking
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("org.json:json:20230618")
+    
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     
     // Image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")

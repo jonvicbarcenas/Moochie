@@ -2,7 +2,7 @@
 
 Moochie is a multi-functional Android application that enables seamless communication and notification management between devices.
 
-![Moochie Logo](app/src/main/res/mipmap-xxxhdpi/ic_launcher.png)
+![Moochie Logo](app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp)
 
 ## Features
 
