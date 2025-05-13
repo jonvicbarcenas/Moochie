@@ -1,0 +1,56 @@
+name: Tag and Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      apk_path:
+        required: true
+        type: string
+      apk_name:
+        required: true
+        type: string
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Download the APK artifact from the build job
+      - name: Download APK artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: app-release
+          path: ./
+
+      # Delete existing tag from remote (if it exists)
+      - name: Delete existing tag
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/v${{ inputs.version }}"; then
+            git push --delete origin "v${{ inputs.version }}"
+          fi
+
+      # Create and push the new tag
+      - name: Create tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
+          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git "v${{ inputs.version }}"
+
+      # Create GitHub Release and upload APK
+      - name: Create GitHub Release and Upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ inputs.version }}"
+          name: "v${{ inputs.version }}"
+          body: "Release version ${{ inputs.version }}"
+          files: ${{ inputs.apk_path }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
