@@ -48,13 +48,11 @@ class NotificationsAdapter(
         private val senderInfoTextView: TextView = itemView.findViewById(R.id.sender_info_text_view)
         
         fun bind(notification: NotificationData) {
-            // Include info about which account this notification is from
             appNameTextView.text = notification.appName
             titleTextView.text = "From: ${notification.title}"
             contentTextView.text = notification.content
             timeTextView.text = notification.formattedTime
 
-            // Display the sender info, which now includes the Gmail account
             if (notification.senderInfo.isNotEmpty()) {
                 senderInfoTextView.text = notification.senderInfo
                 senderInfoTextView.visibility = View.VISIBLE

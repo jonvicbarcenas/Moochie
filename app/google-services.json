@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "675652233226",
+    "firebase_url": "https://moochie-bfc3f-default-rtdb.firebaseio.com",
+    "project_id": "moochie-bfc3f",
+    "storage_bucket": "moochie-bfc3f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675652233226:android:f212280ed5a0ce7be857f3",
+        "android_client_info": {
+          "package_name": "com.cute.moochie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "675652233226-99fut2fgdqe40aljcc6bgceeg40e26rq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cute.moochie",
+            "certificate_hash": "b7d90a3b068a726bac0e972af1c8096de6c57f00"
+          }
+        },
+        {
+          "client_id": "675652233226-9cvt6jdlllf9tkmbti3ttrvlk70goimv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg-M3qPvcqduwoZNQ2zIjwH-rlXnE0SF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "675652233226-9cvt6jdlllf9tkmbti3ttrvlk70goimv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
