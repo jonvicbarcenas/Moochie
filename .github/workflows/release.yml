@@ -1,0 +1,97 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      # Set up Java (required for Gradle)
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # Extract version from build.gradle.kts
+      - name: Extract version
+        id: extract_version
+        run: |
+          VERSION_NAME=$(grep -oP 'versionName\s*=\s*"\K[0-9.]+' app/build.gradle.kts)
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+
+      # Add permission step before running Gradle
+      - name: Grant execute permission for Gradlew
+        run: chmod +x ./gradlew
+
+        # Ensure the directory exists
+      - name: Create directory for JKS
+        run: mkdir -p app/jvb
+
+      # Decode the JKS file
+      - name: Decode JKS file
+        run: |
+          echo "${{ secrets.JKS_BASE64 }}" | base64 -d > app/jvb/dainsleif.jks
+
+
+      # Build the app
+      - name: Build APK
+        run: ./gradlew assembleRelease
+
+      # Delete existing tag from remote (if it exists)
+      - name: Delete existing tag
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/v${{ env.VERSION_NAME }}"; then
+            git push --delete origin "v${{ env.VERSION_NAME }}"
+          fi
+
+      # Create and push the new tag
+      - name: Create tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ env.VERSION_NAME }}" -m "Release v${{ env.VERSION_NAME }}"
+          git push origin "v${{ env.VERSION_NAME }}"
+
+      # Determine APK path and name
+      - name: Set APK file paths
+        id: apk_paths
+        run: |
+          if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            echo "APK_PATH=app/build/outputs/apk/release/app-release.apk" >> $GITHUB_ENV
+            echo "APK_NAME=app-release-v${{ env.VERSION_NAME }}.apk" >> $GITHUB_ENV
+          else
+            echo "APK_PATH=app/build/outputs/apk/release/app-release-unsigned.apk" >> $GITHUB_ENV
+            echo "APK_NAME=app-release-unsigned-v${{ env.VERSION_NAME }}.apk" >> $GITHUB_ENV
+          fi
+
+      # Create GitHub Release and upload APK
+      - name: Create GitHub Release and Upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.VERSION_NAME }}"
+          name: "v${{ env.VERSION_NAME }}"
+          body: "Release version ${{ env.VERSION_NAME }}"
+          files: ${{ env.APK_PATH }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
