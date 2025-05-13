@@ -46,11 +46,10 @@ jobs:
       - name: Create directory for JKS
         run: mkdir -p app/jvb
 
-      # Decode the JKS file
-      - name: Decode JKS file
+      # Create a new keystore file for signing
+      - name: Create keystore file
         run: |
-          echo "${{ secrets.JKS_BASE64 }}" | base64 -d > app/jvb/new_dainsleif.jks
-
+          keytool -genkey -v -keystore app/jvb/release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key0 -storepass 1Barcenas -keypass 1Barcenas -dname "CN=Moochie App, OU=Development, O=Cute, L=Unknown, ST=Unknown, C=US"
 
       # Build the app
       - name: Build APK
