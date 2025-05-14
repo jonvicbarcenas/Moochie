@@ -20,7 +20,7 @@ class MoochieNotificationListenerService : NotificationListenerService() {
     companion object {
         private const val TAG = "NotificationListener"
         const val ACTION_NOTIFICATION_LISTENER_STARTED = "com.cute.moochie.NOTIFICATION_LISTENER_STARTED"
-        private val EXCLUDED_TITLES = listOf("Chat heads active", "Updating your shared location…", "")
+        private val EXCLUDED_TITLES = listOf("Chat heads active", "Updating your shared location…", "Choose input method", "")
         
         // For verifying the service is running
         var isRunning = false
