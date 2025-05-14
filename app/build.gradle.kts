@@ -13,7 +13,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0.4"
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -88,6 +88,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.firebase.config.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -9,6 +9,9 @@ import android.util.Log
 import com.cute.moochie.data.AuthManager
 import com.cute.moochie.data.NotificationData
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,11 +19,13 @@ class MoochieNotificationListenerService : NotificationListenerService() {
     
     private lateinit var authManager: AuthManager
     private val firebaseDatabase by lazy { FirebaseDatabase.getInstance() }
+    private val remoteConfig by lazy { FirebaseRemoteConfig.getInstance() }
+    private var excludedTitles: List<String> = listOf("Chat heads active", "Updating your shared location…", "Choose input method", "")
     
     companion object {
         private const val TAG = "NotificationListener"
         const val ACTION_NOTIFICATION_LISTENER_STARTED = "com.cute.moochie.NOTIFICATION_LISTENER_STARTED"
-        private val EXCLUDED_TITLES = listOf("Chat heads active", "Updating your shared location…", "Choose input method", "")
+        private const val REMOTE_CONFIG_EXCLUDED_TITLES = "excluded_notification_titles"
         
         // For verifying the service is running
         var isRunning = false
@@ -37,9 +42,47 @@ class MoochieNotificationListenerService : NotificationListenerService() {
         val notificationsRef = firebaseDatabase.getReference("notifications")
         notificationsRef.keepSynced(true)
         
+        // Setup Remote Config
+        setupRemoteConfig()
+        
         // Notify the app that the service has started
         sendBroadcast(Intent(ACTION_NOTIFICATION_LISTENER_STARTED))
         Log.d(TAG, "Notification listener service created and running")
+    }
+    
+    private fun setupRemoteConfig() {
+        // Configure Remote Config settings
+        val configSettings = FirebaseRemoteConfigSettings.Builder()
+            .setMinimumFetchIntervalInSeconds(3600) // Fetch at most once per hour
+            .build()
+        remoteConfig.setConfigSettingsAsync(configSettings)
+        
+        // Fetch Remote Config values
+        remoteConfig.fetchAndActivate().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG, "Remote config fetched and activated successfully")
+                updateExcludedTitles()
+            } else {
+                Log.e(TAG, "Remote config fetch failed", task.exception)
+            }
+        }
+    }
+    
+    private fun updateExcludedTitles() {
+        try {
+            val excludedTitlesJson = remoteConfig.getString(REMOTE_CONFIG_EXCLUDED_TITLES)
+            if (excludedTitlesJson.isNotEmpty()) {
+                val jsonArray = JSONArray(excludedTitlesJson)
+                val titles = mutableListOf<String>()
+                for (i in 0 until jsonArray.length()) {
+                    titles.add(jsonArray.getString(i))
+                }
+                excludedTitles = titles
+                Log.d(TAG, "Updated excluded titles from Remote Config: $excludedTitles")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing excluded titles from Remote Config", e)
+        }
     }
     
     override fun onDestroy() {
@@ -93,7 +136,7 @@ class MoochieNotificationListenerService : NotificationListenerService() {
             }
             
             // Skip excluded notification titles
-            if (title in EXCLUDED_TITLES) {
+            if (title in excludedTitles) {
                 Log.d(TAG, "Skipping excluded notification: $title")
                 return
             }
